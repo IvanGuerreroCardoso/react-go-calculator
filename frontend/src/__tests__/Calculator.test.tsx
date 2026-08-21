@@ -1,8 +1,14 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import Calculator from '../components/Calculator'
-import {test, expect} from 'vitest'
+import { test, expect, vi } from 'vitest'
 
-test('adds two numbers and shows result', async () => {
+test('calls backend and shows result', async () => {
+  // mock fetch to return result = 5
+    (globalThis as any).fetch = vi.fn().mockResolvedValue({
+    ok: true,
+    json: async () => ({ result: 5 }),
+  })
+
   render(<Calculator />)
 
   const inputA = screen.getByLabelText('input-a') as HTMLInputElement
@@ -16,4 +22,5 @@ test('adds two numbers and shows result', async () => {
   fireEvent.click(btn)
 
   expect(await screen.findByText(/Result:/)).toHaveTextContent('5')
+    vi.restoreAllMocks()
 })

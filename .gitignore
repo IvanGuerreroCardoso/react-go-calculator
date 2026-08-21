@@ -1,5 +1,6 @@
 # Frontend ingnored files
 /frontend/node_modules
+/frontend/coverage
 package-lock.json
 
 # Backend ignored files
