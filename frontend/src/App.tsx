@@ -1,10 +1,10 @@
-import React from 'react'
+import Calculator from './components/Calculator'
 
 export default function App() {
   return (
     <div style={{fontFamily: 'system-ui, sans-serif', padding: 20}}>
-      <h1>React + Vite</h1>
-      <p>Frontend running.</p>
+      <h1>Calculator</h1>
+      <Calculator />
     </div>
   )
 }

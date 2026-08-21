@@ -1,0 +1,11 @@
+.calc { max-width: 480px; margin: 24px auto; padding: 12px; }
+.inputs { display: flex; gap: 8px; flex-wrap: wrap; }
+.inputs input, .inputs select { flex: 1 1 120px; padding: 8px; font-size: 1rem; }
+.actions { margin-top: 12px; }
+.actions button { padding: 8px 12px; font-size: 1rem; }
+.result { margin-top: 12px; min-height: 1.25rem; }
+.error { color: #b00020; }
+
+@media (max-width: 420px) {
+  .inputs { flex-direction: column; }
+}
