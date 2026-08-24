@@ -134,3 +134,32 @@ func TestHandler_InvalidInput(t *testing.T) {
         t.Fatalf("expected error message, got empty")
     }
 }
+
+func TestDecodeRequest_UnknownField(t *testing.T) {
+    // extra field 'c' should cause DisallowUnknownFields to error
+    rr := httptest.NewRequest("POST", "/api/add", bytes.NewReader([]byte("{\"a\":1,\"b\":2,\"c\":3}")))
+    _, err := decodeRequest(rr)
+    if err == nil {
+        t.Fatalf("expected error for unknown field, got nil")
+    }
+}
+
+func TestDecodeRequest_MalformedJSON(t *testing.T) {
+    rr := httptest.NewRequest("POST", "/api/add", bytes.NewReader([]byte("{bad json")))
+    _, err := decodeRequest(rr)
+    if err == nil {
+        t.Fatalf("expected error for malformed json, got nil")
+    }
+}
+
+func TestWriteJSON_SetsHeadersAndBody(t *testing.T) {
+    w := httptest.NewRecorder()
+    writeJSON(w, 201, CalcResponse{Result: 3.14})
+    resp := w.Result()
+    if resp.StatusCode != 201 {
+        t.Fatalf("expected status 201 got %d", resp.StatusCode)
+    }
+    if ct := resp.Header.Get("Content-Type"); ct != "application/json" {
+        t.Fatalf("expected content-type application/json got %s", ct)
+    }
+}
