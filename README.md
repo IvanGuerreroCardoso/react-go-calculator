@@ -65,3 +65,19 @@ Folder layout
 
 - `frontend/` — Vite + React app (TypeScript)
 - `backend/` — Go HTTP server using `chi`
+
+Docker (optional)
+
+Build and run both services together using Docker Compose:
+
+```bash
+docker compose build
+docker compose up --detach
+# frontend -> http://localhost:5173 , backend -> http://localhost:8080
+```
+
+To stop and remove containers:
+
+```bash
+docker compose down
+```
