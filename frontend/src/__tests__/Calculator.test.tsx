@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import Calculator from '../components/Calculator'
 import { test, expect, vi } from 'vitest'
+import { act } from 'react-dom/test-utils'
 
 test('calls backend and shows result', async () => {
   // mock fetch to return result = 5
@@ -13,14 +14,19 @@ test('calls backend and shows result', async () => {
 
   const inputA = screen.getByLabelText('input-a') as HTMLInputElement
   const inputB = screen.getByLabelText('input-b') as HTMLInputElement
-  const op = screen.getByLabelText('op') as HTMLSelectElement
-  const btn = screen.getByText('Calculate')
+  const plus = screen.getByRole('button', { name: '+' })
+  const eq = screen.getByRole('button', { name: '=' })
 
   fireEvent.change(inputA, { target: { value: '2' } })
   fireEvent.change(inputB, { target: { value: '3' } })
-  fireEvent.change(op, { target: { value: 'add' } })
-  fireEvent.click(btn)
+  // select plus
+  fireEvent.click(plus)
+  // trigger calculation via equals and wrap async update
+  await act(async () => {
+    fireEvent.click(eq)
+  })
 
-  expect(await screen.findByText(/Result:/)).toHaveTextContent('5')
+  const display = await screen.findByLabelText('result')
+  expect(display).toHaveTextContent('5')
     vi.restoreAllMocks()
 })
