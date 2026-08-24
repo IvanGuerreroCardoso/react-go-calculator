@@ -1,7 +1,11 @@
 export type ApiError = { error?: string }
 
+// Read base URL from Vite env var `VITE_API_BASE` (e.g. http://localhost:8080)
+const BASE = ((import.meta as any).env && (import.meta as any).env.VITE_API_BASE) || ''
+
 async function postOp(op: string, a: number, b: number): Promise<number> {
-  const res = await fetch(`/api/${op}`, {
+  const url = BASE ? `${BASE.replace(/\/$/, '')}/api/${op}` : `/api/${op}`
+  const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ a, b }),
