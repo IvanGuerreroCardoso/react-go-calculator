@@ -1,11 +1,22 @@
-.calc { max-width: 480px; margin: 24px auto; padding: 12px; }
-.inputs { display: flex; gap: 8px; flex-wrap: wrap; }
-.inputs input, .inputs select { flex: 1 1 120px; padding: 8px; font-size: 1rem; }
-.actions { margin-top: 12px; }
-.actions button { padding: 8px 12px; font-size: 1rem; }
-.result { margin-top: 12px; min-height: 1.25rem; }
-.error { color: #b00020; }
+.calc { box-sizing: border-box; width: 100%; max-width: 560px; margin: 18px auto; padding: 12px; font-family: system-ui, sans-serif }
+.top { margin-bottom: 12px }
+.inputs-row { display:flex; gap:10px; align-items:center; flex-wrap:wrap }
+.inputs-row input { flex:1 1 0; min-width:0; padding:10px; border-radius:10px; border:1px solid #d0c8b0; box-sizing:border-box }
+.op-inline { padding:6px 10px; border-radius:8px; background:#efe6cf; border:1px solid #d0c8b0; flex:0 0 auto }
+.display-row { margin-top:10px }
+.main { display:flex; gap:12px; justify-content:center; align-items:flex-start }
+.side { width:120px }
 
-@media (max-width: 420px) {
-  .inputs { flex-direction: column; }
+@media (max-width: 480px) {
+  /* Keep keypad and operators side-by-side on narrow screens */
+  .main { flex-direction:row; align-items:flex-start; justify-content:flex-start; gap:8px }
+  .side { width:96px; flex:0 0 96px }
+  .keypad { flex:1 1 auto; min-width:0 }
+  .inputs-row { flex-direction:column; align-items:stretch }
+  .op-inline { margin: 8px 0; align-self:center }
+  .inputs-row input { width:100% }
+  .calc { padding:8px }
+
+  /* Slightly reduce keypad button size on very small screens */
+  .kp-btn { padding:10px; font-size:1rem }
 }

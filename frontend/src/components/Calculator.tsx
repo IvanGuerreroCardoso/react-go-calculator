@@ -1,5 +1,8 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import './calculator.css'
+import Display from './Display'
+import Keypad from './Keypad'
+import Operators from './Operators'
 import * as api from '../api/calculator'
 
 type Op = 'add' | 'subtract' | 'multiply' | 'divide'
@@ -11,19 +14,58 @@ export default function Calculator() {
   const [result, setResult] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [active, setActive] = useState<'a' | 'b'>('a')
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const inputARef = useRef<HTMLInputElement | null>(null)
+  const inputBRef = useRef<HTMLInputElement | null>(null)
 
-  function parseNumber(n: string) {
-    if (n.trim() === '') return null
-    const v = Number(n)
-    return Number.isFinite(v) ? v : null
+  function appendToActive(ch: string) {
+    // only allow digits or period from keypad
+    if (!/^\d|\.$/.test(ch)) return
+    if (active === 'a') setA((s) => s + ch)
+    else setB((s) => s + ch)
   }
 
-  async function calculate() {
+  function backspaceActive() {
+    if (active === 'a') setA((s) => s.slice(0, -1))
+    else setB((s) => s.slice(0, -1))
+  }
+
+  function onKeypadPress(k: string) {
+    if (k === '⌫') return backspaceActive()
+    appendToActive(k)
+  }
+
+  function isValidInputValue(v: string) {
+    // allow empty or only digits with optional single decimal point
+    return /^$|^\d*\.?\d*$/.test(v)
+  }
+
+  function handleOperatorKey(key: string) {
+    const map: Record<string, Op> = {
+      '+': 'add',
+      '-': 'subtract',
+      '*': 'multiply',
+      'x': 'multiply',
+      'X': 'multiply',
+      '/': 'divide',
+    }
+    const sel = map[key]
+    if (sel) {
+      setOp(sel)
+      setActive('b')
+      inputBRef.current?.focus()
+      return true
+    }
+    return false
+  }
+
+  async function doCalculate() {
     setError(null)
     setResult(null)
-    const va = parseNumber(a)
-    const vb = parseNumber(b)
-    if (va === null || vb === null) {
+    const va = a.trim() === '' ? null : Number(a)
+    const vb = b.trim() === '' ? null : Number(b)
+    if (va === null || vb === null || !Number.isFinite(va) || !Number.isFinite(vb)) {
       setError('Please enter valid numbers')
       return
     }
@@ -60,38 +102,50 @@ export default function Calculator() {
   }
 
   return (
-    <div className="calc">
-      <div className="inputs">
-        <input
-          aria-label="input-a"
-          inputMode="decimal"
-          value={a}
-          onChange={(e) => setA(e.target.value)}
-          placeholder="First number"
-        />
-        <select aria-label="op" value={op} onChange={(e) => setOp(e.target.value as Op)}>
-          <option value="add">+</option>
-          <option value="subtract">-</option>
-          <option value="multiply">×</option>
-          <option value="divide">÷</option>
-        </select>
-        <input
-          aria-label="input-b"
-          inputMode="decimal"
-          value={b}
-          onChange={(e) => setB(e.target.value)}
-          placeholder="Second number"
-        />
+    <div className="calc" ref={containerRef}>
+      <div className="top">
+        <div className="inputs-row">
+          <input
+            ref={inputARef}
+            aria-label="input-a"
+            value={a}
+            onFocus={() => setActive('a')}
+            onChange={(e) => {
+              const v = e.target.value
+              if (isValidInputValue(v)) setA(v)
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') return void doCalculate()
+              if (handleOperatorKey(e.key)) e.preventDefault()
+            }}
+          />
+          <div className="op-inline">{op === 'add' ? '+' : op === 'subtract' ? '−' : op === 'multiply' ? '×' : '÷'}</div>
+          <input
+            ref={inputBRef}
+            aria-label="input-b"
+            value={b}
+            onFocus={() => setActive('b')}
+            onChange={(e) => {
+              const v = e.target.value
+              if (isValidInputValue(v)) setB(v)
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') return void doCalculate()
+              if (handleOperatorKey(e.key)) e.preventDefault()
+            }}
+          />
+        </div>
+
+        <div className="display-row">
+          <Display value={loading ? 'Loading...' : error ? error : result !== null ? result : ''} />
+        </div>
       </div>
 
-      <div className="actions">
-        <button onClick={calculate} disabled={loading}>
-          {loading ? 'Calculating…' : 'Calculate'}
-        </button>
-      </div>
-
-      <div className="result">
-        {error ? <div className="error">{error}</div> : result !== null ? <div>Result: {String(result)}</div> : <div />}
+      <div className="main">
+        <Keypad onPress={onKeypadPress} />
+        <div className="side">
+          <Operators selected={op} onSelect={(k) => { setOp(k as Op); setActive('b'); inputBRef.current?.focus() }} onEquals={doCalculate} />
+        </div>
       </div>
     </div>
   )

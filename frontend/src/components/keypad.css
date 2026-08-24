@@ -1,0 +1,6 @@
+.keypad { display:flex; flex-direction:column; gap:8px; }
+.kp-row { display:flex; gap:8px; }
+.kp-btn { flex:1 1 0; padding:12px; border-radius:10px; border:1px solid #c9b894; background:#e9e0cf; font-size:1.1rem; color:#222 }
+.kp-num { background:#e9e0cf }
+.kp-op { background:#dccfb3 }
+.kp-eq { background:#e09a50; font-weight:600; font-size:1.15rem; color:#fff }

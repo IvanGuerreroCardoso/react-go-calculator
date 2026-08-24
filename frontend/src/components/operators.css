@@ -1,0 +1,4 @@
+.ops { display:flex; flex-direction:column; gap:8px; }
+.op-btn { padding:10px 12px; border-radius:10px; border:1px solid #bfae8e; background:#dccfb3; font-size:1.1rem; color:#222 }
+.op-selected { outline:2px solid #caa87a }
+.op-eq { padding:12px 14px; border-radius:12px; border:1px solid #b8773c; background:#e09a50; font-weight:700; font-size:1.2rem; margin-top:8px; color:#fff }
